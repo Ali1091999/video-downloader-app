@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحميل الفيديوهات - Video Downloader</title>
+    <meta name="description" content="أداة مجانية لتحميل الفيديوهات من يوتيوب وانستقرام وفيسبوك بجودة عالية وبسرعة فائقة">
+    <meta name="keywords" content="تحميل فيديوهات, يوتيوب, انستقرام, فيسبوك, تنزيل فيديو, video downloader, youtube downloader, instagram downloader, facebook downloader">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="تحميل الفيديوهات - Video Downloader">
+    <meta property="og:description" content="أداة مجانية لتحميل الفيديوهات من يوتيوب وانستقرام وفيسبوك">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📹</text></svg>">
+    
+    <!-- CSS Styles -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 150px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #555;
+            border: 2px solid #e1e5e9;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        .video-info {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 25px;
+            border-left: 4px solid #667eea;
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .video-details h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .video-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+
+        .meta-value {
+            color: #555;
+            margin-top: 4px;
+        }
+
+        .format-selector {
+            margin-top: 20px;
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .format-card {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .format-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .format-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #c33;
+            display: none;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #363;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #363;
+            display: none;
+        }
+
+        .supported-sites {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: fadeInUp 1s ease-out 0.9s both;
+        }
+
+        .supported-sites h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .sites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .site-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .site-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .site-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .site-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .site-features {
+            list-style: none;
+            color: #666;
+        }
+
+        .site-features li {
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: white;
+            opacity: 0.8;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-card {
+                padding: 25px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📹 تحميل الفيديوهات</h1>
+            <p>أداة مجانية وسريعة لتحميل الفيديوهات من يوتيوب وانستقرام وفيسبوك</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="main-card">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="videoUrl">رابط الفيديو:</label>
+                    <input 
+                        type="url" 
+                        id="videoUrl" 
+                        class="url-input" 
+                        placeholder="الصق رابط الفيديو هنا (YouTube, Instagram, Facebook)"
+                        dir="ltr"
+                    >
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="getVideoInfo()">
+                        🔍 معاينة الفيديو
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearForm()">
+                        🗑️ مسح
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>جاري تحليل الفيديو...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage"></div>
+
+            <!-- Video Info -->
+            <div class="video-info" id="videoInfo">
+                <div class="video-details">
+                    <img class="video-thumbnail" id="videoThumbnail" alt="صورة الفيديو">
+                    <h3 id="videoTitle"></h3>
+                    
+                    <div class="video-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">المنصة</div>
+                            <div class="meta-value" id="videoPlatform"></div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">المدة</div>
+                            <div class="meta-value" id="videoDuration"></div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">الناشر</div>
+                            <div class="meta-value" id="videoUploader"></div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">المشاهدات</div>
+                            <div class="meta-value" id="videoViews"></div>
+                        </div>
+                    </div>
+
+                    <div class="format-selector">
+                        <h4>اختر جودة التحميل:</h4>
+                        <div class="format-grid" id="formatGrid"></div>
+                        
+                        <div class="button-group" style="margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="downloadVideo()">
+                                ⬇️ تحميل الفيديو
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supported Sites -->
+        <div class="supported-sites">
+            <h2>المواقع المدعومة</h2>
+            <div class="sites-grid">
+                <div class="site-card">
+                    <div class="site-icon">🔴</div>
+                    <div class="site-name">YouTube</div>
+                    <ul class="site-features">
+                        <li>فيديوهات عادية</li>
+                        <li>قوائم التشغيل</li>
+                        <li>البث المباشر</li>
+                        <li>جودات متعددة</li>
+                    </ul>
+                </div>
+                
+                <div class="site-card">
+                    <div class="site-icon">📷</div>
+                    <div class="site-name">Instagram</div>
+                    <ul class="site-features">
+                        <li>فيديوهات المنشورات</li>
+                        <li>ريلز (Reels)</li>
+                        <li>IGTV</li>
+                        <li>القصص</li>
+                    </ul>
+                </div>
+                
+                <div class="site-card">
+                    <div class="site-icon">📘</div>
+                    <div class="site-name">Facebook</div>
+                    <ul class="site-features">
+                        <li>فيديوهات عامة</li>
+                        <li>فيديوهات الصفحات</li>
+                        <li>البث المباشر</li>
+                        <li>فيديوهات المجموعات</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2025 تحميل الفيديوهات - جميع الحقوق محفوظة</p>
+            <p>استخدم هذه الأداة بمسؤولية واحترم حقوق النشر</p>
+        </div>
+    </div>
+
+    <script>
+        let currentVideoData = null;
+        let selectedFormat = null;
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('videoInfo').style.display = 'none';
+            hideMessages();
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function formatDuration(seconds) {
+            if (!seconds) return 'غير محدد';
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            if (hours > 0) {
+                return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return 'غير محدد';
+            const sizes = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت'];
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function formatNumber(num) {
+            if (!num) return '0';
+            return num.toLocaleString('ar-EG');
+        }
+
+        async function getVideoInfo() {
+            const url = document.getElementById('videoUrl').value.trim();
+            
+            if (!url) {
+                showError('الرجاء إدخال رابط الفيديو');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const response = await fetch('/api/video-info', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentVideoData = data.data;
+                    displayVideoInfo(data.data);
+                } else {
+                    showError(data.error || 'حدث خطأ في استخراج معلومات الفيديو');
+                }
+            } catch (error) {
+                showError('خطأ في الاتصال بالخادم');
+                console.error('Error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayVideoInfo(videoData) {
+            // عرض الصورة المصغرة
+            const thumbnail = document.getElementById('videoThumbnail');
+            if (videoData.thumbnail) {
+                thumbnail.src = videoData.thumbnail;
+                thumbnail.style.display = 'block';
+            } else {
+                thumbnail.style.display = 'none';
+            }
+
+            // عرض المعلومات
+            document.getElementById('videoTitle').textContent = videoData.title;
+            document.getElementById('videoPlatform').textContent = videoData.platform;
+            document.getElementById('videoDuration').textContent = formatDuration(videoData.duration);
+            document.getElementById('videoUploader').textContent = videoData.uploader;
+            document.getElementById('videoViews').textContent = formatNumber(videoData.view_count);
+
+            // عرض الصيغ المتاحة
+            const formatGrid = document.getElementById('formatGrid');
+            formatGrid.innerHTML = '';
+
+            if (videoData.formats && videoData.formats.length > 0) {
+                videoData.formats.forEach((format, index) => {
+                    const formatCard = document.createElement('div');
+                    formatCard.className = 'format-card';
+                    formatCard.onclick = () => selectFormat(format.format_id, formatCard);
+                    
+                    formatCard.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 8px;">
+                            ${format.quality}p - ${format.ext.toUpperCase()}
+                        </div>
+                        <div style="color: #666; font-size: 0.9rem;">
+                            ${format.format_note || 'جودة عادية'}
+                        </div>
+                        <div style="color: #666; font-size: 0.9rem; margin-top: 4px;">
+                            ${formatFileSize(format.filesize)}
+                        </div>
+                    `;
+                    
+                    formatGrid.appendChild(formatCard);
+                });
+
+                // تحديد أول صيغة افتراضياً
+                if (formatGrid.children.length > 0) {
+                    selectFormat(videoData.formats[0].format_id, formatGrid.children[0]);
+                }
+            } else {
+                formatGrid.innerHTML = '<p>لا توجد صيغ متاحة للتحميل</p>';
+            }
+
+            document.getElementById('videoInfo').style.display = 'block';
+        }
+
+        function selectFormat(formatId, cardElement) {
+            // إزالة التحديد من جميع البطاقات
+            document.querySelectorAll('.format-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // تحديد البطاقة الحالية
+            cardElement.classList.add('selected');
+            selectedFormat = formatId;
+        }
+
+        async function downloadVideo() {
+            if (!currentVideoData || !selectedFormat) {
+                showError('الرجاء اختيار صيغة التحميل أولاً');
+                return;
+            }
+
+            const url = document.getElementById('videoUrl').value.trim();
+            showLoading();
+
+            try {
+                const response = await fetch('/api/download', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        url: url,
+                        format_id: selectedFormat
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(`تم تحميل الفيديو بنجاح: ${data.filename}`);
+                } else {
+                    showError(data.error || 'حدث خطأ في تحميل الفيديو');
+                }
+            } catch (error) {
+                showError('خطأ في الاتصال بالخادم');
+                console.error('Error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('videoUrl').value = '';
+            document.getElementById('videoInfo').style.display = 'none';
+            hideMessages();
+            currentVideoData = null;
+            selectedFormat = null;
+        }
+
+        // إضافة مستمع للضغط على Enter في حقل الإدخال
+        document.getElementById('videoUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                getVideoInfo();
+            }
+        });
+    </script>
+</body>
+</html>
+
