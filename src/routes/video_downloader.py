@@ -62,25 +62,26 @@ def get_enhanced_ydl_opts(platform='youtube'):
     def get_random_proxy():
         return random.choice(proxies) if proxies else None
 
-    base_opts = {
-        'quiet': False,  # تمكين الرسائل للتشخيص
-        'no_warnings': False,
-        'extract_flat': False,
-        'user_agent': random.choice(user_agents),
-        'referer': 'https://www.youtube.com/',
-        'retries': 3,
-        'fragment_retries': 3,
-        'skip_unavailable_fragments': True,
-        'keep_fragments': False,
-        'http_headers': {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-us,en;q=0.5',
-            'Accept-Encoding': 'gzip, deflate',
-            'DNT': '1',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
+        base_opts = {
+            'quiet': False,  # تمكين الرسائل للتشخيص
+            'no_warnings': False,
+            'extract_flat': False,
+            'user_agent': random.choice(user_agents),
+            'referer': 'https://www.youtube.com/',
+            'retries': 3,
+            'fragment_retries': 3,
+            'skip_unavailable_fragments': True,
+            'keep_fragments': False,
+            'nocheckcertificate': True, # تجاهل أخطاء شهادة SSL
+            'http_headers': {
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-us,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate',
+                'DNT': '1',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1',
+            }
         }
-    }
 
     # إضافة البروكسي إذا كان متاحاً
     if get_random_proxy():
@@ -365,4 +366,5 @@ def debug_video_info():
         
     except Exception as e:
         return jsonify({'error': f'خطأ في التشخيص: {str(e)}'}), 500
+
 
